@@ -1,0 +1,12 @@
+// Zellij config for the tenx agent session.
+//
+// Restores the old single-stroke `Ctrl-\` detach from the tmux days: press
+// it from any pane and zellij disconnects the client (session + claude stay
+// running on the VM; reattach via `tenxctl attach <id>`).
+//
+// Zellij's default detach is `Ctrl-o d` — that still works in parallel.
+keybinds {
+    shared_except "locked" {
+        bind "Ctrl \\" { Detach; }
+    }
+}

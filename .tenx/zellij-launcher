@@ -1,0 +1,16 @@
+#!/bin/sh
+# [agent].bin — invoked by tenxd inside a fresh PTY. Boots a persistent
+# zellij session named "tenx" using the tenx layout + config, *without*
+# attaching a client. The server-only session means tenxd never holds a
+# ghost client that would clamp the interactive terminal's size via
+# min(clients). First client to the session is `tenxctl attach <id>` /
+# tenxweb's WS bridge.
+#
+# `--create-background` is a first-party zellij feature (v0.40+); the
+# command returns as soon as the server is up, so tenxd just observes
+# Wait return zero and proceeds into the health loop.
+set -e
+zellij \
+    --config /etc/zellij/config.kdl \
+    attach --create-background tenx \
+    options --default-layout /etc/zellij/tenx-layout.kdl

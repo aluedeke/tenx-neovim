@@ -1,0 +1,44 @@
+FROM node:20-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      ca-certificates curl make build-essential git unzip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/locale
+
+RUN npm install -g @anthropic-ai/claude-code
+
+# Neovim from official release.
+ARG NVIM_VERSION=0.10.4
+RUN curl -fsSL "https://github.com/neovim/neovim/releases/download/v${NVIM_VERSION}/nvim-linux-x86_64.tar.gz" \
+      | tar -xzC /usr/local --strip-components=1
+
+# Zellij (no-web variant: tenxweb is our web terminal).
+ARG ZELLIJ_VERSION=0.44.1
+ARG ZELLIJ_SHA256=f55f0fb825d7cde5d6194127453e07b7e99d015bc9ccc6239dd26e785f2165cc
+RUN curl -fsSL "https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-no-web-x86_64-unknown-linux-musl.tar.gz" \
+      | tar -xzC /usr/local/bin zellij && \
+    echo "${ZELLIJ_SHA256}  /usr/local/bin/zellij" | sha256sum -c - && \
+    chmod +x /usr/local/bin/zellij
+
+# Neovim config — copied from the operator's local ~/.config/nvim.
+RUN mkdir -p /root/.config/nvim
+COPY nvim/init.lua /root/.config/nvim/init.lua
+
+# Pre-install lazy.nvim plugins so the first session starts instantly.
+# Treesitter parsers compile native binaries — build-essential covers gcc.
+RUN nvim --headless "+Lazy! sync" +qa 2>&1 || true
+
+# Pre-accept Claude Code's onboarding dialogs + seed /workspace as trusted.
+RUN mkdir -p /root/.claude
+COPY claude.json /root/.claude.json
+COPY claude-settings.json /root/.claude/settings.json
+
+# tenx scripts + zellij layout/config.
+RUN mkdir -p /etc/zellij
+COPY zellij-launcher   /usr/local/bin/zellij-launcher
+COPY claude-launcher   /usr/local/bin/claude-launcher
+COPY tenx-attach       /usr/local/bin/tenx-attach
+COPY tenx-layout.kdl   /etc/zellij/tenx-layout.kdl
+COPY zellij-config.kdl /etc/zellij/config.kdl
+RUN chmod +x /usr/local/bin/zellij-launcher /usr/local/bin/claude-launcher /usr/local/bin/tenx-attach

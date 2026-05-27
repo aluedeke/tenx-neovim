@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "echo idle > /run/tenxd/agent-state" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "echo active > /run/tenxd/agent-state" } ] }
+    ],
+    "PreToolUse": [
+      { "hooks": [ { "type": "command", "command": "echo active > /run/tenxd/agent-state" } ] }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+region = "fra"
+repo   = "https://github.com/checkly-solutions/local-support.git"
+branch = "feat/agent-runner"
+
+command = ["zellij-launcher"]
+
+[vm]
+size   = "shared-cpu-2x"
+memory = "2gb"
+
+[secrets]
+forward = ["CLAUDE_CODE_OAUTH_TOKEN", "GH_TOKEN"]
+
+[build]
+dockerfile = ".tenx/Dockerfile.claude"
+context    = ".tenx"

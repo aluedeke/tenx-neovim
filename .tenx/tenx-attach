@@ -1,0 +1,12 @@
+#!/bin/sh
+# Invoked by the gateway over docker exec / SSH to attach a browser terminal
+# to the running zellij session. Tries to attach directly; retries if the
+# session is not ready yet (tenxd is still spawning it on cold start).
+# Skips list-sessions to avoid an extra zellij process startup on each open.
+i=0
+while [ "$i" -lt 20 ]; do
+  zellij --config /etc/zellij/config.kdl attach tenx && exit 0
+  i=$((i + 1))
+  sleep 0.25
+done
+exec zellij --config /etc/zellij/config.kdl attach tenx

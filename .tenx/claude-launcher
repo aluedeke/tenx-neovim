@@ -1,0 +1,24 @@
+#!/bin/sh
+# Invoked inside the zellij pane (see tenx-layout.kdl). Reads $AGENT_PROMPT
+# (set by `tenxctl run --prompt …` or piped stdin) and passes it to claude as
+# the opening user message; if no prompt was given, runs claude with no args.
+#
+# We wrap claude instead of `exec`-ing it so that if claude exits for any
+# reason (missing token, crash, /exit), the pane drops to a shell with a
+# readable exit-code banner instead of vanishing with close_on_exit=true
+# firing on an empty pane.
+if [ -n "$AGENT_PROMPT" ]; then
+    claude "$AGENT_PROMPT"
+else
+    claude
+fi
+code=$?
+printf '\n\n--- claude exited with code %s ---\n' "$code"
+printf 'dropping to a shell; type "exec claude" to relaunch.\n\n'
+# /bin/sh is always present; /bin/bash isn't in every base image
+# (-slim flavors sometimes omit it), so falling through to bash
+# would exec-fail and collapse the pane.
+if command -v bash >/dev/null 2>&1; then
+    exec bash
+fi
+exec /bin/sh
