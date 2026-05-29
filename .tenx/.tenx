@@ -14,7 +14,3 @@ forward = ["CLAUDE_CODE_OAUTH_TOKEN", "GH_TOKEN"]
 [build]
 dockerfile = ".tenx/Dockerfile.claude"
 context    = ".tenx"
-
-[docker]
-# Mount the host Docker socket so the agent can run docker commands.
-mounts = ["/var/run/docker.sock:/var/run/docker.sock"]
