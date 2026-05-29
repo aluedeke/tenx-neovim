@@ -1,6 +1,9 @@
+# Generic TypeScript + zellij + neovim companion.
+#
+# Set repo = "https://github.com/you/your-repo.git" to hardwire a workspace,
+# or leave it unset and pass --repo / --branch at spawn time.
+
 region = "fra"
-repo   = "https://github.com/checkly-solutions/local-support.git"
-branch = "feat/agent-runner"
 
 command = ["zellij-launcher"]
 
